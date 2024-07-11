@@ -120,10 +120,21 @@ def main():
         print(f"  Features std: {test_features.std().item():.4f}")
         
         result = classifier.predict([test_features.cpu().numpy()])
-        print("Image is real" if result[0] == 1 else "Image is generated")
+        if result[0]:
+            print("Image is likely real")
+        else:
+            print("Image is likely generated")
         
         plot_feature_distributions(real_features, test_features.cpu().numpy(), f'feature_distributions_test_{i+1}.png')
         compare_features(real_features, test_features)
+ 
+        real_features_array = np.array(real_features)
+        test_features_np = test_features.cpu().numpy()
+        feature_diff = np.abs(np.mean(real_features_array, axis=0) - test_features_np[0])
+        top_diff_indices = np.argsort(feature_diff)[-5:][::-1]
+        print("\nTop 5 most different features:")
+        for idx in top_diff_indices:
+            print(f"Feature {idx}: diff = {feature_diff[idx]:.4f}")
 
 if __name__ == "__main__":
     main()
