@@ -18,3 +18,7 @@ git clone https://github.com/Linear-Fox-Labs/DePixel
 cd DePixel
 pip install -r requirements.txt
 ```
+
+## Acknowledgments
+
+- DePixel based on: Xiuli Bi, Bo Liu, et al. for their research paper "Detecting Generated Images by Real Images Only" https://arxiv.org/abs/2311.00962
