@@ -61,3 +61,5 @@ This will train the model using the real images and save the trained model as de
 
 ## Acknowledgments
 - DePixel based on: Xiuli Bi, Bo Liu, et al. for their research paper "Detecting Generated Images by Real Images Only" https://arxiv.org/abs/2311.00962
+
+- DePixel Authors: Nathan Fargo at Linear Fox Labs.
