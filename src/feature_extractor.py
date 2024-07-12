@@ -6,19 +6,15 @@ class FeatureExtractor:
         self.k = k
 
     def extract_features(self, lnp):
-        # Existing feature extraction
         amplitude_spectrum = torch.abs(torch.fft.fft2(lnp))
+
         enhanced_spectrum = self._enhance_spectrum(amplitude_spectrum)
-        sampled_features = self._sample_features(enhanced_spectrum)
-        
-        # New features
+        sampled_features = self._sample_features(enhanced_spectrum) 
         gradient_features = self._gradient_features(lnp)
         noise_features = self._noise_features(lnp)
         
-        # Combine all features
         all_features = torch.cat([sampled_features, gradient_features, noise_features])
         
-        # Normalize
         return (all_features - all_features.mean()) / (all_features.std() + 1e-8)
 
     def _enhance_spectrum(self, spectrum):
