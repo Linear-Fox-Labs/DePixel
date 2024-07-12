@@ -1,0 +1,18 @@
+training:
+  data_dir: 'data/real_images'
+  image_size: [256, 256]
+  batch_size: 32
+  learning_rate: 0.001
+  num_epochs: 10
+
+inference:
+  real_images_path: 'data/real_images/'
+  test_images_path: 'data/test_images/'
+  plot_features: 5
+
+model:
+  denoising_network_path: 'denoising_network.pth'
+
+evaluation:
+  real_images: 'data/evaluation/real_images/'
+  fake_images: 'data/evaluation/fake_images/'
