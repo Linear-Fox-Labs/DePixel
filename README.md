@@ -38,7 +38,7 @@ pip install -r requirements.txt
 
 ## Training
 To train the denoising network:
-```python scripts/train.py```
+```python training/train.py```
 
 This will train the model using the real images and save the trained model as denoising_network.pth.
 
