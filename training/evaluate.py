@@ -11,9 +11,10 @@ from src.classifier import Classifier
 import yaml
 import logging
 from tqdm import tqdm
+import os
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
-PLOT_FEATURES = 2
+PLOT_FEATURES = 5
 
 def load_config(config_path):
     with open(config_path, 'r') as file:
@@ -32,12 +33,14 @@ def load_images(image_paths, transform):
 
 def extract_features(images, lnp_extractor, feature_extractor, device):
     features = []
+    lnps = []
     for img in tqdm(images, desc="Extracting features"):
         img_tensor = img.unsqueeze(0).to(device)
         lnp = lnp_extractor.extract_lnp(img_tensor)
         feature = feature_extractor.extract_features(lnp.squeeze(0))
         features.append(feature.cpu().numpy())
-    return np.array(features)
+        lnps.append(lnp.squeeze(0).cpu().numpy())
+    return np.array(features), np.array(lnps)
 
 def plot_roc_curve(fpr, tpr, roc_auc):
     plt.figure()
@@ -74,40 +77,10 @@ def plot_confusion_matrix(cm, classes):
     plt.savefig('confusion_matrix.png')
     plt.close()
 
-def plot_feature_distributions(real_features, test_features, filename):
-    """Plot feature distributions for real and test images."""
-    real_features = np.array(real_features)
-    test_features = np.array(test_features)
-    
-    if test_features.ndim == 1:
-        test_features = test_features.reshape(1, -1)
-    
+def plot_feature_distributions(real_features, fake_features):
     plt.figure(figsize=(15, 5))
     for i in range(min(PLOT_FEATURES, real_features.shape[1])):
         plt.subplot(1, PLOT_FEATURES, i+1)
-        plt.hist(real_features[:, i], bins=20, alpha=0.5, label='Real')
-        plt.axvline(test_features[0, i], color='r', linestyle='dashed', linewidth=2, label='Test')
-        plt.title(f'Feature {i+1}')
-        if i == 0:
-            plt.legend()
-    plt.tight_layout()
-    plt.savefig(filename)
-    plt.close()
-
-def compare_features(real_features, fake_features):
-    real_mean = np.mean(real_features, axis=0)
-    real_std = np.std(real_features, axis=0)
-    fake_mean = np.mean(fake_features, axis=0)
-    fake_std = np.std(fake_features, axis=0)
-    
-    logging.info("\nFeature comparison:")
-    logging.info(f"  Mean difference: {np.mean(np.abs(real_mean - fake_mean)):.4f}")
-    logging.info(f"  Std difference: {np.mean(np.abs(real_std - fake_std)):.4f}")
-     
-    num_features = min(5, real_features.shape[1])
-    plt.figure(figsize=(15, 5))
-    for i in range(num_features):
-        plt.subplot(1, num_features, i+1)
         plt.hist(real_features[:, i], bins=20, alpha=0.5, label='Real')
         plt.hist(fake_features[:, i], bins=20, alpha=0.5, label='Fake')
         plt.title(f'Feature {i+1}')
@@ -115,6 +88,23 @@ def compare_features(real_features, fake_features):
             plt.legend()
     plt.tight_layout()
     plt.savefig('feature_distributions.png')
+    plt.close()
+
+def plot_lnp(real_lnp, fake_lnp):
+    fig, axes = plt.subplots(2, 3, figsize=(15, 10))
+    fig.suptitle('Learned Noise Pattern (LNP) Comparison')
+    
+    for i, (r_lnp, f_lnp) in enumerate(zip(real_lnp[:3], fake_lnp[:3])):
+        axes[0, i].imshow(r_lnp.transpose(1, 2, 0))
+        axes[0, i].set_title(f'Real LNP {i+1}')
+        axes[0, i].axis('off')
+        
+        axes[1, i].imshow(f_lnp.transpose(1, 2, 0))
+        axes[1, i].set_title(f'Fake LNP {i+1}')
+        axes[1, i].axis('off')
+    
+    plt.tight_layout()
+    plt.savefig('lnp_comparison.png')
     plt.close()
 
 def evaluate(config):
@@ -135,10 +125,11 @@ def evaluate(config):
     real_images = load_images(config['evaluation']['real_images'], transform)
     fake_images = load_images(config['evaluation']['fake_images'], transform)
 
-    real_features = extract_features(real_images, lnp_extractor, feature_extractor, device)
-    fake_features = extract_features(fake_images, lnp_extractor, feature_extractor, device)
+    real_features, real_lnps = extract_features(real_images, lnp_extractor, feature_extractor, device)
+    fake_features, fake_lnps = extract_features(fake_images, lnp_extractor, feature_extractor, device)
  
-    compare_features(real_features, fake_features)
+    plot_feature_distributions(real_features, fake_features)
+    plot_lnp(real_lnps, fake_lnps)
  
     y_true = np.concatenate([np.ones(len(real_features)), np.zeros(len(fake_features))])
     X = np.concatenate([real_features, fake_features])
@@ -159,8 +150,8 @@ def evaluate(config):
     plot_roc_curve(fpr, tpr, roc_auc)
     plot_confusion_matrix(cm, ['Fake', 'Real'])
 
-    logging.info("Evaluation complete. ROC curve, confusion matrix, and feature distributions saved.")
+    logging.info("Evaluation complete. ROC curve, confusion matrix, feature distributions, and LNP comparison saved.")
 
 if __name__ == "__main__":
-    config = load_config('configs/config.yaml')
+    config = load_config('config.yaml')
     evaluate(config)

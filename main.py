@@ -4,8 +4,10 @@ from PIL import Image
 import os
 import logging
 from tqdm import tqdm
-from src.denoising_network import DenoisingNetwork
-# import numpy as np
+from src.denoising_network import DenoisingNetwork 
+import cProfile
+import pstats
+from pstats import SortKey
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
@@ -66,5 +68,13 @@ def main():
             
             logging.info(f"Image: {filename}, Prediction: {'real' if prediction == 1 else 'generated'}, Score: {score:.4f}, True Label: {'real' if true_label == 1 else 'generated'}")
 
+def profile_main():
+    with cProfile.Profile() as pr:
+        main()  # Your existing main function
+    
+    stats = pstats.Stats(pr)
+    stats.sort_stats(SortKey.TIME)
+    stats.dump_stats('depixel_profile.prof')
+
 if __name__ == "__main__":
-    main()
+    profile_main()

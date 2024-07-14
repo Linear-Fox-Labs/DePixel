@@ -9,6 +9,8 @@ inference:
   real_images_path: 'data/real_images/'
   test_images_path: 'data/test_images/'
   plot_features: 5
+  image_size: [256, 256]  # [height, width]
+  precomputed_features_path: 'data/precomputed_features.pkl'
 
 model:
   denoising_network_path: 'denoising_network.pth'
