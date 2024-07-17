@@ -24,12 +24,6 @@ cd DePixel
 pip install -r requirements.txt
 ```
 
-## Usage
-1. Prepare your dataset:
-- Place real images in the `data/real_images/` directory
-- Place test images (real or AI-generated) in the `data/test_images/` directory
-2. Run the main script.
-
 ## Customization
 - Adjust `IMAGE_SIZE` in `main.py` to change the input image size
 - Modify `PLOT_FEATURES` in `main.py` to change the number of features displayed in distribution plots
@@ -37,7 +31,11 @@ pip install -r requirements.txt
 - Modify the config.yaml file to adjust settings.
 
 ## Training
-To train the denoising network:
+1. Prepare your dataset:
+- Place real images in the `data/real_images/` directory
+- Place test images (real or AI-generated) in the `data/test_images/` directory
+
+2. To train the denoising network:
 ```python training/train.py```
 
 This will train the model using the real images and save the trained model as denoising_network.pth.
