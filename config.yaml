@@ -18,3 +18,11 @@ model:
 evaluation:
   real_images: 'data/evaluation/real_images/'
   fake_images: 'data/evaluation/fake_images/'
+
+logging:
+  level: 'INFO'
+  format: '%(asctime)s - %(levelname)s - %(message)s'
+
+device:
+  use_cuda: true
+  fallback_to_cpu: true

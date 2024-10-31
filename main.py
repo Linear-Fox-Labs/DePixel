@@ -47,6 +47,7 @@ def process_output(output):
 
 
 def main():
+    logging.info("Starting main function")
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     logging.info(f"Using device: {device}")
 
@@ -67,6 +68,8 @@ def main():
             prediction, score = process_output(output)
             
             logging.info(f"Image: {filename}, Prediction: {'real' if prediction == 1 else 'generated'}, Score: {score:.4f}, True Label: {'real' if true_label == 1 else 'generated'}")
+
+    logging.info("Main function completed")
 
 def profile_main():
     with cProfile.Profile() as pr:
