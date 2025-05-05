@@ -1,8 +1,3 @@
-
-<p align="center">
-  <img src="https://cdn.linearfox.com/assets/img/logo/512/whiteblack.png" alt="DePixel Logo" width="100"/>
-</p>
-
 # DePixel - Image Authenticity Detection
 Distinguish between real and AI-generated images.
 
